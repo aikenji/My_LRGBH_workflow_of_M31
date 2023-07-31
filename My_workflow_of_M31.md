@@ -21,7 +21,7 @@ by aiken 07/29/2023
 
 ## Workflow diagram
 
-![workflow](./images/workflow.png)
+<img src="./images/workflow.png" alt="workflow">
 
 ## Linear process
 
@@ -36,13 +36,12 @@ LRGBHa图像经过wbpp预处理后，开始进入线性处理阶段（linear pro
 
 LRGBHa五个通道的图像经过对齐后，在边缘区域都会有一些黑边，需要通过DynamicCrop工具剪切掉。可以先选择L通道crop，再重复crop其他通道。值得注意的是当需要把一次crop的参数应用到所有图像时，PI中Dynmaic的组件比较特殊，设置好参数后，通过底边小三角拖出的instance不能直接应用于图像，需要先选取要应用的图像，再双击instance，然后再点击底边的绿色勾，才能执行相同剪裁。详细步骤可参考grapeot的b站视频：<https://www.bilibili.com/video/BV1rp4y1t7MC?t=222.9>。另外也可以使用imageContainer来实现重复操作。
 
-![crop](./images/crop.png =200x)
-
+<img src="./images/crop.png" alt="crop" height=200>
 ### DBE
 
 五个通道裁剪完成后，接着对每个图像分别执行dbe（DynamicBackgroudExtraction），这一步是用来去除背景的梯度，梯度通常是由光污染导致的。
 
-![dbe](./images/dbe.png =200x)
+<img src="./images/dbe.png" alt="dbe" height=200>
 
 对于星系这种集中的目标，背景和目标很容易区分，可以使用sample generation功能自动生成背景选点，选点的sample radius设置为30-50，注意去除和星系较近的选点。如果边缘的选点为红色，可以适当增加tolerance 如2.00。完成选点后，拖出instance，可以对其他图像执行相同选点的dbe，过程类似crop中的操作。详细步骤可参考grapeot的视频：<https://www.bilibili.com/video/BV1rp4y1t7MC?t=372.8> 
 
