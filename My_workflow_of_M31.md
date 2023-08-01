@@ -37,6 +37,7 @@ LRGBHa图像经过wbpp预处理后，开始进入线性处理阶段（linear pro
 LRGBHa五个通道的图像经过对齐后，在边缘区域都会有一些黑边，需要通过DynamicCrop工具剪切掉。可以先选择L通道crop，再重复crop其他通道。值得注意的是当需要把一次crop的参数应用到所有图像时，PI中Dynmaic的组件比较特殊，设置好参数后，通过底边小三角拖出的instance不能直接应用于图像，需要先选取要应用的图像，再双击instance，然后再点击底边的绿色勾，才能执行相同剪裁。详细步骤可参考grapeot的b站视频：<https://www.bilibili.com/video/BV1rp4y1t7MC?t=222.9>。另外也可以使用imageContainer来实现重复操作。
 
 <img src="./images/crop.png" alt="crop" height=200>
+
 ### DBE
 
 五个通道裁剪完成后，接着对每个图像分别执行dbe（DynamicBackgroudExtraction），这一步是用来去除背景的梯度，梯度通常是由光污染导致的。
@@ -126,3 +127,11 @@ GHS是目前官方比较推荐的一种比较高级的拉伸办法,目前我还�
 如果图像除了星系部分,还有暗云气,那么可以分两步拉伸:首先拉伸图像的星系部分;然后拉伸暗云气,注意由于云气部分很暗,拉伸的时候很容易把星系拉曝,为了解决这个问题,可以使用背景mask拉伸.背景mask的制作推荐使用RangeSelection工具,如图所示调低upper limit,使得星系部分为黑色,提高smoothness使得mask的过渡平滑.这样就得到一张只露出背景的mask了.
 
 <img src="./images/range.png" alt="rangemask" height=350>
+
+#### ColorBalance
+
+根据直方图的R、G、B成分是不是重合,确定背景是不是中性灰.如果偏绿,可以使用SCNR去绿,注意搭配背景mask,保护星系的颜色. 之后做RGB的色彩平衡,此处的色彩调整是很主观的,和实际的星系颜色关系不大.同样加上背景mask保护好背景的中性灰.采用CT工具调整颜色平衡,首先拉高Satruatioon,调整绿色曲线,点击图像中要修改色彩的地方,CT会显示该色彩在曲线图中的位置,若要增加绿色,则拉高曲线,反之拉低曲线.若要维持该点的绿色成分,则可以使用多个锚点保护不需要处理的区域.
+
+<img src="./images/colbal.png" alt="colbal" height=size>
+
+
