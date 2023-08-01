@@ -17,6 +17,17 @@ by aiken 07/29/2023
     - [L channel](#l-channel)
       - [BXT](#bxt)
       - [NXT](#nxt)
+  - [Nonlinear process](#nonlinear-process)
+    - [RGB channel](#rgb-channel)
+      - [Stretch](#stretch)
+      - [ColorBalance](#colorbalance)
+    - [L channel](#l-channel)
+      - [LHE](#lhe)
+    - [LRGB Combination](#lrgb-combination)
+    - [DarkStructureEnhance](#darkstructureenhance)
+    - [HDR](#hdr)
+    - [Saturation](#saturation)
+  - [Conclution](#conclution)
 <!--toc:end-->
 
 ## Workflow diagram
@@ -132,6 +143,45 @@ GHS是目前官方比较推荐的一种比较高级的拉伸办法,目前我还�
 
 根据直方图的R、G、B成分是不是重合,确定背景是不是中性灰.如果偏绿,可以使用SCNR去绿,注意搭配背景mask,保护星系的颜色. 之后做RGB的色彩平衡,此处的色彩调整是很主观的,和实际的星系颜色关系不大.同样加上背景mask保护好背景的中性灰.采用CT工具调整颜色平衡,首先拉高Satruatioon,调整绿色曲线,点击图像中要修改色彩的地方,CT会显示该色彩在曲线图中的位置,若要增加绿色,则拉高曲线,反之拉低曲线.若要维持该点的绿色成分,则可以使用多个锚点保护不需要处理的区域.
 
-<img src="./images/colbal.png" alt="colbal" height=size>
+<img src="./images/colbal.png" alt="colbal" height=400>
 
+另外还有一种方法是调整a、b、c曲线,此方法有待研究. 最后做一步convolution, 减少RGB图像的细节特征, 这一步optional.
 
+###  L channel
+
+---
+
+完成RGB通道的处理后, 我们开始L通道的非线性处理, 为了突出L通道的细节特征, 可以在HT拉伸后, 再用CT对局部拉伸, 方法同上. 需要注意的是,曲线在该点斜率大于1, 表示该点附近的细节被突出, 反之小于1, 细节被掩盖.
+
+#### LHE
+
+L通道拉伸完后, 为了进一步压榨细节, 可以使用LHE工具对局部特征再次进行拉伸. LHE的原理就是对局部做HE, 这样的好处是可以使亮部和暗部的细节都得到提升. 如之前的拉伸使得M31盘面亮部的细节很明显,但是星系的暗云气细节不够明显(注意这里是星系的暗云气, 不是背景的暗云气). 我们使用LHE拉伸这部分云气, 注意一定要使用背景mask, 保护背景, 不然LHE会拉出背景的噪声. L通道的处理就算基本完成了.
+
+<img src="./images/LHE.png" alt="LHE" height=size>
+
+### LRGB Combination
+
+完成两个通道的处理后, 可以对LRGB的合成了. 采用LRGBCombination工具如图所示, 将L通道合成到RGB图像中, 值得注意的是这里的saturation数值越小, 饱和度越大. 可以勾选上Chrominance Noise Reduction 去除图像中的彩色噪声.
+
+<img src="./images/lrgb.png" alt="lrgb" height=300>
+
+合成完后的图像就没有严格的处理顺序了.
+
+### DarkStructureEnhance
+
+该脚本和LHE类似, 其作用是只针对图像的暗结构做加强, M31的星系螺旋暗云气就是用这种方法加强的.不过后期尝试了以下LHE发现效果基本一致.
+
+### HDR
+
+由于星系的核心一般较亮,很容易拉伸过曝, 特别是M31和M42, 所以可以使用EZ HDR脚本减少中心的亮度.
+
+### Saturation
+
+最后,图像的饱和度推荐使用PS来处理, 效果会更好,操作也更简单. 用pixinsight导出16tiff.
+导入到photoshop中, 采用cameraRAW filter滤镜中的color mixer工具, 调整特定颜色的饱和度和亮度以及Hue值.
+
+## Conclution
+
+最后得到一张漂亮的M31星系.
+
+<img src="./images/M31.png" alt="m31" height=size>
